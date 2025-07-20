@@ -17,9 +17,10 @@ function Dashboard() {
 
   const getUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
       setUsers(res.data.users);
     } catch (err) {
       console.error("Error fetching users", err);

@@ -76,24 +76,28 @@ export const ChatProvider = ({
   const [showImagePreview, setShowImagePreview] = useState(false);
 
   // Fetch users
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const me = await axios.get("http://localhost:5000/api/users/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCurrentUserId(me.data.user._id);
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
 
-        const res = await axios.get(`http://localhost:5000/api/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setReceiver(res.data.user);
-      } catch (err) {
-        console.error("Error fetching user data", err);
-      }
-    };
-    if (token && userId) fetchData();
-  }, [token, userId]);
+      const me = await axios.get(`${apiUrl}/api/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCurrentUserId(me.data.user._id);
+
+      const res = await axios.get(`${apiUrl}/api/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setReceiver(res.data.user);
+    } catch (err) {
+      console.error("Error fetching user data", err);
+    }
+  };
+
+  if (token && userId) fetchData();
+}, [token, userId]);
+
 
   // Listen to messages
   useEffect(() => {

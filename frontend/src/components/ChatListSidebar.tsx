@@ -33,9 +33,13 @@ export default function ChatListSidebar({ currentUserId }: { currentUserId: stri
       const updatedList = await Promise.all(
         rawList.map(async (chat) => {
           try {
-            const userRes = await axios.get(`http://localhost:5000/api/users/${chat.userId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
+       const userRes = await axios.get(
+  `${import.meta.env.VITE_API_URL}/api/users/${chat.userId}`,
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
+
 
             const chatId = generateChatId(currentUserId, chat.userId);
             const msgRef = collection(db, "chats", chatId, "messages");
