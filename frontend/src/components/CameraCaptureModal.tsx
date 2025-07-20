@@ -1,71 +1,75 @@
-// ✅ New Component: CameraCaptureModal.tsx
-import { useEffect, useRef, useState } from "react";
-import { IoClose } from "react-icons/io5";
+import React, { useEffect, useRef, useState } from "react";
 
-interface CameraCaptureModalProps {
+interface Props {
+  mode: "photo" | "video";
   onClose: () => void;
   onCapture: (mediaUrl: string) => void;
-  mode: "photo" | "video";
 }
 
-const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ onClose, onCapture, mode }) => {
+const CameraCaptureModal: React.FC<Props> = ({ mode, onClose, onCapture }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
+  const chunksRef = useRef<Blob[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [currentMode, setCurrentMode] = useState<"photo" | "video">(mode);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
+  // Get user camera stream
   useEffect(() => {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: mode === "video",
+          video: { facingMode },
+          audio: currentMode === "video",
         });
         mediaStreamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-      } catch (error) {
-        console.error("Failed to access camera", error);
+      } catch (err) {
+        console.error("Camera access denied:", err);
         onClose();
       }
     };
 
     startCamera();
+
     return () => {
       mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
-  }, [mode, onClose]);
+  }, [facingMode, currentMode, onClose]);
 
+  // 📸 Take Photo
   const capturePhoto = () => {
-    const video = videoRef.current;
-    if (!video) return;
+    if (!videoRef.current) return;
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d")?.drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL("image/jpeg");
-    onCapture(dataUrl);
-    onClose();
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      const imageUrl = canvas.toDataURL("image/png");
+      onCapture(imageUrl);
+      onClose();
+    }
   };
 
+  // 🎥 Start Recording
   const startRecording = () => {
-    const stream = mediaStreamRef.current;
-    if (!stream) return;
-
-    const recorder = new MediaRecorder(stream);
+    if (!mediaStreamRef.current) return;
+    const recorder = new MediaRecorder(mediaStreamRef.current);
     mediaRecorderRef.current = recorder;
-    recordedChunksRef.current = [];
+    chunksRef.current = [];
 
     recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      if (e.data.size > 0) chunksRef.current.push(e.data);
     };
 
     recorder.onstop = () => {
-      const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
-      const url = URL.createObjectURL(blob);
-      onCapture(url);
+      const blob = new Blob(chunksRef.current, { type: "video/mp4" });
+      const videoUrl = URL.createObjectURL(blob);
+      onCapture(videoUrl);
       onClose();
     };
 
@@ -78,43 +82,50 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ onClose, onCapt
     setIsRecording(false);
   };
 
+  const toggleFacingMode = () => {
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col items-center justify-center">
-      <div className="relative">
-        <video ref={videoRef} autoPlay playsInline className="rounded-md w-full max-w-[500px]" />
+    <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className="absolute inset-0 w-full h-full object-cover"
+      />
 
+      {/* Header Controls */}
+      <div className="absolute top-4 left-4 right-4 flex justify-between text-white z-10">
+        <button onClick={onClose} className="text-lg font-semibold">✖ Close</button>
+        <button onClick={toggleFacingMode} className="text-lg font-semibold">🔁 Flip</button>
+      </div>
+
+      {/* Mode Switch */}
+      <div className="absolute top-16 text-white text-sm z-10">
         <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-white text-2xl bg-gray-800 rounded-full p-1"
+          onClick={() => setCurrentMode((prev) => (prev === "photo" ? "video" : "photo"))}
+          className="bg-gray-800 px-4 py-2 rounded"
         >
-          <IoClose />
+          Mode: {currentMode === "photo" ? "📸 Photo" : "🎥 Video"}
         </button>
+      </div>
 
-        {mode === "photo" ? (
+      {/* Center Capture Button */}
+      <div className="absolute bottom-10 flex items-center justify-center w-full z-10">
+        {currentMode === "photo" ? (
           <button
             onClick={capturePhoto}
-            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full"
-          >
-            Capture Photo
-          </button>
+            className="w-20 h-20 bg-white rounded-full border-4 border-gray-800"
+          />
         ) : (
-          <div className="mt-4 flex gap-4">
-            {!isRecording ? (
-              <button
-                onClick={startRecording}
-                className="px-6 py-2 bg-red-600 text-white rounded-full"
-              >
-                Start Recording
-              </button>
-            ) : (
-              <button
-                onClick={stopRecording}
-                className="px-6 py-2 bg-green-600 text-white rounded-full"
-              >
-                Stop Recording
-              </button>
-            )}
-          </div>
+          <button
+            onClick={isRecording ? stopRecording : startRecording}
+            className={`w-20 h-20 rounded-full border-4 ${
+              isRecording ? "bg-red-600 border-red-800" : "bg-white border-gray-800"
+            }`}
+          />
         )}
       </div>
     </div>

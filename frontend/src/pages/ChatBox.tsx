@@ -224,15 +224,16 @@ function ChatBox() {
 
         {/* 📷 Camera Modal */}
         {showCameraModal && (
-          <CameraCaptureModal
-            mode={cameraMode}
-            onClose={() => setShowCameraModal(false)}
-            onCapture={(mediaUrl) => {
-              setSelectedImages([mediaUrl]);
-              setShowImagePreview(true);
-            }}
-          />
-        )}
+  <CameraCaptureModal
+    mode={cameraMode}
+    onClose={() => setShowCameraModal(false)}
+    onCapture={(mediaUrl) => {
+      setSelectedImages([mediaUrl]);
+      setShowImagePreview(true);
+    }}
+  />
+)}
+
       </div>
     </div>
   );
