@@ -1,7 +1,7 @@
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { generateChatId } from "../utils/chatId";
@@ -16,8 +16,16 @@ interface ChatMeta {
 
 export default function ChatListSidebar({ currentUserId }: { currentUserId: string }) {
   const [chatList, setChatList] = useState<ChatMeta[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { token } = useAuth();
+  const { userId: chatParamUserId } = useParams(); // If routing contains userId
+
+  useEffect(() => {
+    if (chatParamUserId) {
+      setSelectedUserId(chatParamUserId);
+    }
+  }, [chatParamUserId]);
 
   useEffect(() => {
     if (!currentUserId || !token) return;
@@ -33,13 +41,12 @@ export default function ChatListSidebar({ currentUserId }: { currentUserId: stri
       const updatedList = await Promise.all(
         rawList.map(async (chat) => {
           try {
-       const userRes = await axios.get(
-  `${import.meta.env.VITE_API_URL}/api/users/${chat.userId}`,
-  {
-    headers: { Authorization: `Bearer ${token}` },
-  }
-);
-
+            const userRes = await axios.get(
+              `${import.meta.env.VITE_API_URL}/api/users/${chat.userId}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
 
             const chatId = generateChatId(currentUserId, chat.userId);
             const msgRef = collection(db, "chats", chatId, "messages");
@@ -88,8 +95,15 @@ export default function ChatListSidebar({ currentUserId }: { currentUserId: stri
         {chatList.map((chat) => (
           <li
             key={chat.userId}
-            onClick={() => navigate(`/chat/${chat.userId}`)}
-            className="p-3 hover:bg-gray-700 rounded cursor-pointer transition"
+            onClick={() => {
+              setSelectedUserId(chat.userId);
+              navigate(`/chat/${chat.userId}`);
+            }}
+            className={`p-3 rounded cursor-pointer transition ${
+              selectedUserId === chat.userId
+                ? "bg-gray-700"
+                : "hover:bg-gray-700"
+            }`}
           >
             <div className="flex justify-between items-center font-semibold">
               <span>{chat.name}</span>

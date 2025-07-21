@@ -55,6 +55,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        
       </Routes>
     </>
   );

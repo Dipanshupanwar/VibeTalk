@@ -6,6 +6,8 @@ import ChatAttachmentMenu from "../components/chatAttachmentMenu";
 import ImagePreviewModal from "../components/ImagePreviewModal";
 import CameraCaptureModal from "../components/CameraCaptureModal";
 import { IoIosArrowDown } from "react-icons/io";
+import ChatHeader from "../components/ChatHeader";
+import { useNavigate } from "react-router-dom";
 
 function ChatBox() {
   const {
@@ -33,6 +35,13 @@ function ChatBox() {
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [cameraMode, setCameraMode] = useState<"photo" | "video">("photo");
 
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
+  const unreadRef = useRef(0);
+  const lastUnreadMessageId = useRef<string | null>(null);
+  const navigate = useNavigate();
+
   const handleEmojiClick = (emojiData: any) => {
     setText((prev) => prev + emojiData.emoji);
   };
@@ -42,71 +51,74 @@ function ChatBox() {
     if (type === "gallery" || type === "video") {
       fileInputRef.current?.click();
     } else if (type === "camera") {
-      setCameraMode("photo"); // You can customize this for "video" too
+      setCameraMode("photo");
       setShowCameraModal(true);
     }
   };
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "auto" });
-  }, []);
-
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (!container) return;
-
-    const threshold = 150;
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight <
-      threshold;
-
-    if (isNearBottom) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
 
   const handleScroll = () => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    const isAtBottom =
+    const isBottom =
       container.scrollHeight - container.scrollTop <=
-      container.clientHeight + 100;
+      container.clientHeight + 50;
 
-    setShowScrollButton(!isAtBottom);
+    setIsAtBottom(isBottom);
+
+    if (isBottom) {
+      unreadRef.current = 0;
+      setUnreadCount(0);
+      lastUnreadMessageId.current = null;
+      setShowScrollButton(false);
+    } else {
+      setShowScrollButton(true);
+    }
   };
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    unreadRef.current = 0;
+    setUnreadCount(0);
+    lastUnreadMessageId.current = null;
     setShowScrollButton(false);
   };
+
+  // 🔄 Scroll if user is at bottom or sender is user
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container || messages.length === 0) return;
+
+    const isUserAtBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+
+    setIsAtBottom(isUserAtBottom);
+
+    const lastMsg = messages[messages.length - 1];
+
+    if (isUserAtBottom || lastMsg?.senderId === currentUserId) {
+      scrollToBottom(); // ✅ Scroll if sender is current user OR user is already at bottom
+    } else if (
+      lastMsg &&
+      lastMsg.senderId !== currentUserId &&
+      lastMsg.id !== lastUnreadMessageId.current
+    ) {
+      lastUnreadMessageId.current = lastMsg.id;
+      unreadRef.current += 1;
+      setUnreadCount(unreadRef.current);
+      setShowScrollButton(true);
+    }
+  }, [messages, currentUserId]);
 
   return (
     <div className="h-full w-full bg-gray-600 text-white flex flex-col">
       <div className="w-full h-full bg-gray-800 flex flex-col relative">
         {/* 🔵 Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900">
-          <div className="text-lg font-semibold">
-            Chatting with:{" "}
-            <span className="text-blue-400">{receiver?.name || "Loading..."}</span>
-          </div>
-          <div className="flex gap-4 text-gray-300">
-            <button
-              onClick={() => alert(`Calling ${receiver?.name}...`)}
-              title="Voice Call"
-              className="hover:text-green-400 transition"
-            >
-              📞
-            </button>
-            <button
-              onClick={() => alert(`Starting video call with ${receiver?.name}...`)}
-              title="Video Call"
-              className="hover:text-blue-400 transition"
-            >
-              📹
-            </button>
-          </div>
-        </div>
+        <ChatHeader
+          receiver={receiver || {}}
+          onVoiceCall={() => console.log("Voice call")}
+          onVideoCall={() => console.log("Video call")}
+        />
 
         {/* 🔵 Messages */}
         <div
@@ -114,39 +126,60 @@ function ChatBox() {
           onScroll={handleScroll}
           className="flex-1 overflow-y-auto px-4 py-3 space-y-2 custom-scrollbar"
         >
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`max-w-[80%] sm:max-w-[70%] px-4 py-2 rounded-lg text-sm shadow-md break-words ${
-                msg.senderId === currentUserId
-                  ? "ml-auto bg-blue-600 text-white"
-                  : "mr-auto bg-gray-700 text-gray-200"
-              }`}
-            >
-              {msg.mediaUrl ? (
-                msg.mediaUrl.match(/\.(mp4|webm|ogg)$/i) ? (
-                  <video controls className="max-w-full rounded-md">
-                    <source src={msg.mediaUrl} type="video/mp4" />
-                  </video>
+          {messages.map((msg) => {
+            const isSentByCurrentUser = msg.senderId === currentUserId;
+
+            return (
+              <div
+                key={msg.id}
+                className={`max-w-[80%] sm:max-w-[70%] px-4 py-2 rounded-lg text-sm shadow-md break-words ${
+                  isSentByCurrentUser
+                    ? "ml-auto bg-blue-600 text-white"
+                    : "mr-auto bg-gray-700 text-gray-200"
+                }`}
+              >
+                {msg.mediaUrl ? (
+                  msg.mediaType === "video" ? (
+                    <video controls className="max-w-full rounded-md">
+                      <source src={msg.mediaUrl} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <img src={msg.mediaUrl} alt="sent" className="max-w-full rounded-md" />
+                  )
                 ) : (
-                  <img src={msg.mediaUrl} alt="sent" className="max-w-full rounded-md" />
-                )
-              ) : (
-                msg.text
-              )}
-            </div>
-          ))}
+                  <div>{msg.text}</div>
+                )}
+
+                {isSentByCurrentUser && (
+                  <div className="text-right text-xs mt-1 flex justify-end items-center gap-1">
+                    {msg.seenBy && msg.seenBy.length > 1 ? (
+                      <span className="text-green-400">✓✓</span>
+                    ) : (
+                      <span className="text-white">✓✓</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
           <div ref={bottomRef} />
         </div>
 
-        {/* 🔽 Scroll Button */}
+        {/* 🔽 Scroll Button with badge */}
         {showScrollButton && (
-          <button
-            onClick={scrollToBottom}
-            className="absolute bottom-24 right-6 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg"
-          >
-            <IoIosArrowDown size={24} />
-          </button>
+          <div className="absolute bottom-24 right-4 z-50">
+            <button
+              onClick={scrollToBottom}
+              className="relative bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg"
+            >
+              <IoIosArrowDown size={24} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          </div>
         )}
 
         {/* ✍️ Input Area */}
@@ -154,6 +187,7 @@ function ChatBox() {
           onSubmit={(e) => {
             e.preventDefault();
             sendMessage();
+            scrollToBottom();
           }}
           className="flex items-center gap-2 p-4 border-t border-gray-700 relative"
         >
@@ -224,16 +258,15 @@ function ChatBox() {
 
         {/* 📷 Camera Modal */}
         {showCameraModal && (
-  <CameraCaptureModal
-    mode={cameraMode}
-    onClose={() => setShowCameraModal(false)}
-    onCapture={(mediaUrl) => {
-      setSelectedImages([mediaUrl]);
-      setShowImagePreview(true);
-    }}
-  />
-)}
-
+          <CameraCaptureModal
+            mode={cameraMode}
+            onClose={() => setShowCameraModal(false)}
+            onCapture={(mediaUrl) => {
+              setSelectedImages([mediaUrl]);
+              setShowImagePreview(true);
+            }}
+          />
+        )}
       </div>
     </div>
   );

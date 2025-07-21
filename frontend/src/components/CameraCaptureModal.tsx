@@ -15,14 +15,17 @@ const CameraCaptureModal: React.FC<Props> = ({ mode, onClose, onCapture }) => {
   const [currentMode, setCurrentMode] = useState<"photo" | "video">(mode);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
-  // Get user camera stream
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
   useEffect(() => {
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode },
+        const constraints: MediaStreamConstraints = {
+          video: isMobile ? { facingMode } : true,
           audio: currentMode === "video",
-        });
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         mediaStreamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -40,7 +43,6 @@ const CameraCaptureModal: React.FC<Props> = ({ mode, onClose, onCapture }) => {
     };
   }, [facingMode, currentMode, onClose]);
 
-  // 📸 Take Photo
   const capturePhoto = () => {
     if (!videoRef.current) return;
     const canvas = document.createElement("canvas");
@@ -55,7 +57,6 @@ const CameraCaptureModal: React.FC<Props> = ({ mode, onClose, onCapture }) => {
     }
   };
 
-  // 🎥 Start Recording
   const startRecording = () => {
     if (!mediaStreamRef.current) return;
     const recorder = new MediaRecorder(mediaStreamRef.current);
@@ -83,6 +84,7 @@ const CameraCaptureModal: React.FC<Props> = ({ mode, onClose, onCapture }) => {
   };
 
   const toggleFacingMode = () => {
+    if (!isMobile) return; // Prevent on desktop
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
   };
 
@@ -99,7 +101,9 @@ const CameraCaptureModal: React.FC<Props> = ({ mode, onClose, onCapture }) => {
       {/* Header Controls */}
       <div className="absolute top-4 left-4 right-4 flex justify-between text-white z-10">
         <button onClick={onClose} className="text-lg font-semibold">✖ Close</button>
-        <button onClick={toggleFacingMode} className="text-lg font-semibold">🔁 Flip</button>
+        {isMobile && (
+          <button onClick={toggleFacingMode} className="text-lg font-semibold">🔁 Flip</button>
+        )}
       </div>
 
       {/* Mode Switch */}
