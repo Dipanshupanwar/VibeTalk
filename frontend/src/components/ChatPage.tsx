@@ -10,32 +10,72 @@ function ChatPage() {
   const { token } = useAuth();
   const [currentUserId, setCurrentUserId] = useState("");
   const { userId } = useParams();
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640); // sm breakpoint (Tailwind default)
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Fetch logged in user
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/me`, {
-  headers: { Authorization: `Bearer ${token}` },
-});
-
-      setCurrentUserId(res.data.user._id);
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCurrentUserId(res.data.user._id);
+      } catch (err) {
+        console.error("Failed to fetch current user:", err);
+      }
     };
     fetchUser();
   }, [token]);
 
-  if (!currentUserId || !userId) return <p>Loading...</p>;
+  if (!currentUserId) return <p className="text-white p-4">Loading...</p>;
 
+  // Mobile logic
+  if (isMobile) {
+    return (
+      <div className="h-screen bg-gray-900 text-white">
+        {userId ? (
+          <ChatProvider userId={userId}>
+            <ChatBox />
+          </ChatProvider>
+        ) : (
+          <ChatListSidebar currentUserId={currentUserId} />
+        )}
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
-    <div className="flex h-screen">
-      {/* 🟢 Sidebar with its own scroll */}
-      <div className="w-[300px] bg-gray-900 overflow-y-auto custom-scrollbar">
+    <div className="flex h-screen bg-gray-900 text-white">
+      {/* 🟢 Sidebar */}
+      <div className="w-[300px] border-r border-gray-700 overflow-y-auto custom-scrollbar">
         <ChatListSidebar currentUserId={currentUserId} />
       </div>
 
-      {/* 🟦 Chat area with ChatBox */}
-      <div className="flex-1 flex flex-col h-full">
-        <ChatProvider userId={userId}>
-          <ChatBox />
-        </ChatProvider>
+      {/* 🟦 Chat area */}
+      <div className="flex-1 flex items-center justify-center relative">
+        {userId ? (
+          <ChatProvider userId={userId}>
+            <ChatBox />
+          </ChatProvider>
+        ) : (
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl font-bold text-blue-400">Welcome to DipChat 💬</h2>
+            <p className="text-gray-400">Select a user from the sidebar to start chatting.</p>
+            <p className="text-sm text-gray-500">Your conversations appear here.</p>
+          </div>
+        )}
       </div>
     </div>
   );

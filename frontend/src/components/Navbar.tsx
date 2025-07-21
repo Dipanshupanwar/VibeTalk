@@ -5,7 +5,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Navigate without stacking same route in history
   const handleNavigation = (path: string) => {
     if (location.pathname !== path) {
       navigate(path);
@@ -25,9 +24,9 @@ export default function Navbar() {
 
         {/* Right: Icons and profile */}
         <div className="flex items-center space-x-6">
-          {/* Messages */}
+          {/* ✅ Messages */}
           <div
-            onClick={() => handleNavigation("/dashboard")}
+            onClick={() => handleNavigation("/chatpage")}
             className="flex items-center space-x-1 cursor-pointer hover:text-blue-400 transition"
           >
             <FaEnvelope className="text-lg" />

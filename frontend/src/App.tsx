@@ -55,7 +55,14 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        
+        <Route
+          path="/chatpage"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
