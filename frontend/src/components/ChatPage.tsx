@@ -71,7 +71,7 @@ function ChatPage() {
           </ChatProvider>
         ) : (
           <div className="text-center space-y-3">
-            <h2 className="text-3xl font-bold text-blue-400">Welcome to DipChat 💬</h2>
+            <h2 className="text-3xl font-bold text-blue-400">Welcome to  ByteChat 💬</h2>
             <p className="text-gray-400">Select a user from the sidebar to start chatting.</p>
             <p className="text-sm text-gray-500">Your conversations appear here.</p>
           </div>

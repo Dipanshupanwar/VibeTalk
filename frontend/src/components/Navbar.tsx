@@ -15,12 +15,23 @@ export default function Navbar() {
     <nav className="bg-gray-900 text-white px-4 py-3 shadow-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Left: Logo */}
-        <div
-          className="text-xl font-bold cursor-pointer hover:text-blue-400 transition"
-          onClick={() => handleNavigation("/dashboard")}
-        >
-          DipChat
-        </div>
+       <div
+  className="flex items-center space-x-3 cursor-pointer group"
+  onClick={() => handleNavigation("/dashboard")}
+>
+  <div className="p-1 bg-white rounded-full shadow-md group-hover:scale-105 transition-transform duration-200">
+    <img
+      src="/src/assets/bytecipher_logo.png" // ✅ Adjust as needed
+      alt="Logo"
+      className="h-8 w-8 object-contain"
+    />
+  </div>
+  <span className="text-2xl font-extrabold tracking-tight text-white group-hover:text-blue-400 transition-colors duration-200">
+    ByteChat
+  </span>
+</div>
+
+
 
         {/* Right: Icons and profile */}
         <div className="flex items-center space-x-6">

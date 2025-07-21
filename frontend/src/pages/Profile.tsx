@@ -105,13 +105,7 @@ export default function Profile() {
                 </div>
               )}
 
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full"
-              >
-                {uploading ? "Uploading..." : "Edit Photo"}
-              </button>
+             
               <input
                 type="file"
                 accept="image/*"
