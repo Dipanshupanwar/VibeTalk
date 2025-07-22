@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useChatContext } from "../context/chatContext";
 import EmojiPicker from "emoji-picker-react";
 import { FaSmile } from "react-icons/fa";
-import ChatAttachmentMenu from "../components/chatAttachmentMenu";
+import ChatAttachmentMenu from "../components/ChatAttachmentMenu";
 import ImagePreviewModal from "../components/ImagePreviewModal";
 import CameraCaptureModal from "../components/CameraCaptureModal";
 import { IoIosArrowDown } from "react-icons/io";
@@ -84,7 +84,6 @@ function ChatBox() {
     setShowScrollButton(false);
   };
 
-  // 🔄 Scroll if user is at bottom or sender is user
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container || messages.length === 0) return;
@@ -97,7 +96,7 @@ function ChatBox() {
     const lastMsg = messages[messages.length - 1];
 
     if (isUserAtBottom || lastMsg?.senderId === currentUserId) {
-      scrollToBottom(); // ✅ Scroll if sender is current user OR user is already at bottom
+      scrollToBottom();
     } else if (
       lastMsg &&
       lastMsg.senderId !== currentUserId &&
@@ -113,18 +112,16 @@ function ChatBox() {
   return (
     <div className="h-full w-full bg-gray-600 text-white flex flex-col">
       <div className="w-full h-full bg-gray-800 flex flex-col relative">
-        {/* 🔵 Header */}
         <ChatHeader
           receiver={receiver || {}}
           onVoiceCall={() => console.log("Voice call")}
           onVideoCall={() => console.log("Video call")}
         />
 
-        {/* 🔵 Messages */}
         <div
           ref={messagesContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto px-4 py-3 space-y-2 custom-scrollbar"
+          className="flex-1 overflow-y-auto px-2 sm:px-4 py-3 space-y-2 custom-scrollbar"
         >
           {messages.map((msg) => {
             const isSentByCurrentUser = msg.senderId === currentUserId;
@@ -132,7 +129,7 @@ function ChatBox() {
             return (
               <div
                 key={msg.id}
-                className={`max-w-[80%] sm:max-w-[70%] px-4 py-2 rounded-lg text-sm shadow-md break-words ${
+                className={`max-w-[85%] sm:max-w-[75%] md:max-w-[65%] lg:max-w-[50%] px-4 py-2 rounded-lg text-sm shadow-md break-words ${
                   isSentByCurrentUser
                     ? "ml-auto bg-blue-600 text-white"
                     : "mr-auto bg-gray-700 text-gray-200"
@@ -165,9 +162,8 @@ function ChatBox() {
           <div ref={bottomRef} />
         </div>
 
-        {/* 🔽 Scroll Button with badge */}
         {showScrollButton && (
-          <div className="absolute bottom-24 right-4 z-50">
+          <div className="fixed bottom-24 right-4 sm:right-6 z-50">
             <button
               onClick={scrollToBottom}
               className="relative bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg"
@@ -182,14 +178,13 @@ function ChatBox() {
           </div>
         )}
 
-        {/* ✍️ Input Area */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             sendMessage();
             scrollToBottom();
           }}
-          className="flex items-center gap-2 p-4 border-t border-gray-700 relative"
+          className="flex items-center flex-wrap gap-2 p-3 border-t border-gray-700 relative"
         >
           <button
             type="button"
@@ -219,7 +214,7 @@ function ChatBox() {
             <FaSmile size={24} />
           </button>
           {showEmojiPicker && (
-            <div className="absolute bottom-[60px] left-12 z-10">
+            <div className="absolute bottom-[60px] left-2 sm:left-12 z-10 max-w-[90vw]">
               <EmojiPicker onEmojiClick={handleEmojiClick} />
             </div>
           )}
@@ -228,7 +223,7 @@ function ChatBox() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 bg-gray-700 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 min-w-[150px] px-4 py-2 bg-gray-700 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
@@ -238,7 +233,6 @@ function ChatBox() {
           </button>
         </form>
 
-        {/* 📸 Preview Modal */}
         {showImagePreview && selectedImages.length > 0 && (
           <ImagePreviewModal
             images={selectedImages}
@@ -256,7 +250,6 @@ function ChatBox() {
           />
         )}
 
-        {/* 📷 Camera Modal */}
         {showCameraModal && (
           <CameraCaptureModal
             mode={cameraMode}

@@ -1,4 +1,3 @@
-// src/components/ChatHeader.tsx
 import React from "react";
 
 interface ChatHeaderProps {
@@ -8,27 +7,27 @@ interface ChatHeaderProps {
   onVoiceCall: () => void;
   onVideoCall: () => void;
 }
-    
+
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   receiver,
   onVoiceCall,
   onVideoCall,
 }) => {
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-700 shadow-sm">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-wrap sm:flex-nowrap items-center justify-between p-3 sm:p-4 bg-gray-900 border-b border-gray-700 shadow-sm">
+      <div className="flex items-center gap-3 flex-grow min-w-0">
         <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xl font-bold text-white uppercase">
           {receiver?.name?.[0] || "U"}
         </div>
-        <div>
-          <div className="font-semibold text-lg text-white">
+        <div className="truncate">
+          <div className="font-semibold text-lg text-white truncate">
             {receiver?.name || "Loading..."}
           </div>
-          <div className="text-xs text-gray-400"></div>
+          <div className="text-xs text-gray-400">Active now</div>
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 mt-2 sm:mt-0 sm:ml-4">
         <button
           onClick={onVoiceCall}
           title="Voice Call"
