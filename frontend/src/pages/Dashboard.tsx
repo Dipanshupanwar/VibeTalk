@@ -52,7 +52,7 @@ function Dashboard() {
           className="text-center space-y-3"
         >
           <h2 className="text-4xl font-bold text-blue-600">
-            Welcome back, Chat Explorer!
+            Welcome back, Chat Explorer!!!
           </h2>
           <p className="text-gray-600 text-lg">
             Start a conversation. Connect. Collaborate.{" "}
