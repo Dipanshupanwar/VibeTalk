@@ -3,7 +3,7 @@ import { useChatContext } from "../context/chatContext";
 import EmojiPicker from "emoji-picker-react";
 import { FaSmile } from "react-icons/fa";
 // Correct import
-import ChatAttachmentMenu from "../components/chatAttachmentMenu"; 
+import ChatAttachmentMenu from "../components/chatAttachmentMenu";
 import ImagePreviewModal from "../components/ImagePreviewModal";
 import CameraCaptureModal from "../components/CameraCaptureModal";
 import { IoIosArrowDown } from "react-icons/io";
