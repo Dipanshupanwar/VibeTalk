@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useChatContext } from "../context/chatContext";
 import EmojiPicker from "emoji-picker-react";
 import { FaSmile } from "react-icons/fa";
-import ChatAttachmentMenu from "../components/ChatAttachmentMenu";
+// Correct import
+import ChatAttachmentMenu from "../components/chatAttachmentMenu"; 
 import ImagePreviewModal from "../components/ImagePreviewModal";
 import CameraCaptureModal from "../components/CameraCaptureModal";
 import { IoIosArrowDown } from "react-icons/io";
