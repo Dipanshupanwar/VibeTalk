@@ -89,7 +89,8 @@ function ChatBox() {
     if (!container || messages.length === 0) return;
 
     const isUserAtBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      100;
 
     setIsAtBottom(isUserAtBottom);
 
@@ -141,7 +142,11 @@ function ChatBox() {
                       <source src={msg.mediaUrl} type="video/mp4" />
                     </video>
                   ) : (
-                    <img src={msg.mediaUrl} alt="sent" className="max-w-full rounded-md" />
+                    <img
+                      src={msg.mediaUrl}
+                      alt="sent"
+                      className="max-w-full rounded-md"
+                    />
                   )
                 ) : (
                   <div>{msg.text}</div>
@@ -177,71 +182,69 @@ function ChatBox() {
             </button>
           </div>
         )}
-<form
-  onSubmit={(e) => {
-    e.preventDefault();
-    sendMessage();
-    scrollToBottom();
-  }}
-  className="w-full flex items-center gap-2 px-3 py-2 border-t border-gray-700 bg-gray-800"
->
-  {/* ➕ Attachment Button */}
-  <button
-    type="button"
-    onClick={() => setShowAttachmentMenu((prev) => !prev)}
-    className="text-white bg-gray-700 hover:bg-gray-600 p-2 rounded-full"
-  >
-    +
-  </button>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
+            scrollToBottom();
+          }}
+          className="w-full flex items-center gap-2 px-3 py-2 border-t border-gray-700 bg-gray-800"
+        >
+          {/* ➕ Attachment Button */}
+          <button
+            type="button"
+            onClick={() => setShowAttachmentMenu((prev) => !prev)}
+            className="text-white bg-gray-700 hover:bg-gray-600 p-2 rounded-full"
+          >
+            +
+          </button>
 
-  {showAttachmentMenu && (
-    <ChatAttachmentMenu onSelect={handleAttachmentSelect} />
-  )}
+          {showAttachmentMenu && (
+            <ChatAttachmentMenu onSelect={handleAttachmentSelect} />
+          )}
 
-  <input
-    type="file"
-    accept="image/*,video/*"
-    ref={fileInputRef}
-    onChange={handleImageUpload}
-    multiple
-    className="hidden"
-  />
+          <input
+            type="file"
+            accept="image/*,video/*"
+            ref={fileInputRef}
+            onChange={handleImageUpload}
+            multiple
+            className="hidden"
+          />
 
-  {/* 😊 Emoji Button */}
-  <button
-    type="button"
-    onClick={() => setShowEmojiPicker((prev) => !prev)}
-    className="text-yellow-300 hover:text-yellow-400"
-  >
-    <FaSmile size={22} />
-  </button>
+          {/* 😊 Emoji Button */}
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+            className="text-yellow-300 hover:text-yellow-400"
+          >
+            <FaSmile size={22} />
+          </button>
 
-  {showEmojiPicker && (
-    <div className="absolute bottom-[60px] left-2 sm:left-12 z-10 max-w-[90vw]">
-      <EmojiPicker onEmojiClick={handleEmojiClick} />
-    </div>
-  )}
+          {showEmojiPicker && (
+            <div className="absolute bottom-[60px] left-2 sm:left-12 z-10 max-w-[90vw]">
+              <EmojiPicker onEmojiClick={handleEmojiClick} />
+            </div>
+          )}
 
-  {/* ✍️ Text Input */}
-  <div className="flex-1">
-    <input
-      value={text}
-      onChange={(e) => setText(e.target.value)}
-      placeholder="Type a message..."
-      className="w-full px-4 py-2 bg-gray-700 rounded-full text-white text-sm focus:outline-none"
-    />
-  </div>
+          {/* ✍️ Text Input */}
+          <div className="flex-1">
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type a message..."
+              className="w-full px-4 py-2 bg-gray-700 rounded-full text-white text-sm focus:outline-none"
+            />
+          </div>
 
-  {/* 📤 Send Button */}
-  <button
-    type="submit"
-    className="p-2 px-3 sm:px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm"
-  >
-    Send
-  </button>
-</form>
-
-
+          {/* 📤 Send Button */}
+          <button
+            type="submit"
+            className="p-2 px-3 sm:px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm"
+          >
+            Send
+          </button>
+        </form>
 
         {showImagePreview && selectedImages.length > 0 && (
           <ImagePreviewModal
