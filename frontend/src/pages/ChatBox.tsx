@@ -183,13 +183,13 @@ function ChatBox() {
     sendMessage();
     scrollToBottom();
   }}
-  className="w-full flex flex-wrap items-center gap-2 p-3 border-t border-gray-700 bg-gray-800"
+  className="w-full flex items-center gap-2 px-3 py-2 border-t border-gray-700 bg-gray-800"
 >
   {/* ➕ Attachment Button */}
   <button
     type="button"
     onClick={() => setShowAttachmentMenu((prev) => !prev)}
-    className="text-white bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-full"
+    className="text-white bg-gray-700 hover:bg-gray-600 p-2 rounded-full"
   >
     +
   </button>
@@ -198,7 +198,6 @@ function ChatBox() {
     <ChatAttachmentMenu onSelect={handleAttachmentSelect} />
   )}
 
-  {/* 📁 Hidden File Input */}
   <input
     type="file"
     accept="image/*,video/*"
@@ -214,7 +213,7 @@ function ChatBox() {
     onClick={() => setShowEmojiPicker((prev) => !prev)}
     className="text-yellow-300 hover:text-yellow-400"
   >
-    <FaSmile size={24} />
+    <FaSmile size={22} />
   </button>
 
   {showEmojiPicker && (
@@ -224,21 +223,24 @@ function ChatBox() {
   )}
 
   {/* ✍️ Text Input */}
-  <input
-    value={text}
-    onChange={(e) => setText(e.target.value)}
-    placeholder="Type a message..."
-    className="flex-1 min-w-[0] w-full sm:w-auto px-4 py-2 bg-gray-700 rounded-full text-white focus:outline-none"
-  />
+  <div className="flex-1">
+    <input
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      placeholder="Type a message..."
+      className="w-full px-4 py-2 bg-gray-700 rounded-full text-white text-sm focus:outline-none"
+    />
+  </div>
 
   {/* 📤 Send Button */}
   <button
     type="submit"
-    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full whitespace-nowrap"
+    className="p-2 px-3 sm:px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm"
   >
     Send
   </button>
 </form>
+
 
 
         {showImagePreview && selectedImages.length > 0 && (
