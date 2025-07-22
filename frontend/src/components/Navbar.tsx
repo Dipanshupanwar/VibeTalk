@@ -1,6 +1,7 @@
 import { FaUserCircle, FaEnvelope } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 
+
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,7 +22,7 @@ export default function Navbar() {
 >
   <div className="p-1 bg-white rounded-full shadow-md group-hover:scale-105 transition-transform duration-200">
     <img
-      src="/src/assets/bytecipher_logo.png" // ✅ Adjust as needed
+      src="/assets/bytecipher_logo.png" // ✅ Adjust as needed
       alt="Logo"
       className="h-8 w-8 object-contain"
     />
