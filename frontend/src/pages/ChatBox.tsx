@@ -177,61 +177,69 @@ function ChatBox() {
             </button>
           </div>
         )}
+<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    sendMessage();
+    scrollToBottom();
+  }}
+  className="w-full flex flex-wrap items-center gap-2 p-3 border-t border-gray-700 bg-gray-800"
+>
+  {/* ➕ Attachment Button */}
+  <button
+    type="button"
+    onClick={() => setShowAttachmentMenu((prev) => !prev)}
+    className="text-white bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-full"
+  >
+    +
+  </button>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            sendMessage();
-            scrollToBottom();
-          }}
-          className="flex items-center flex-wrap gap-2 p-3 border-t border-gray-700 relative"
-        >
-          <button
-            type="button"
-            onClick={() => setShowAttachmentMenu((prev) => !prev)}
-            className="text-white bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded-full"
-          >
-            +
-          </button>
-          {showAttachmentMenu && (
-            <ChatAttachmentMenu onSelect={handleAttachmentSelect} />
-          )}
+  {showAttachmentMenu && (
+    <ChatAttachmentMenu onSelect={handleAttachmentSelect} />
+  )}
 
-          <input
-            type="file"
-            accept="image/*,video/*"
-            ref={fileInputRef}
-            onChange={handleImageUpload}
-            multiple
-            className="hidden"
-          />
+  {/* 📁 Hidden File Input */}
+  <input
+    type="file"
+    accept="image/*,video/*"
+    ref={fileInputRef}
+    onChange={handleImageUpload}
+    multiple
+    className="hidden"
+  />
 
-          <button
-            type="button"
-            onClick={() => setShowEmojiPicker((prev) => !prev)}
-            className="text-yellow-300 hover:text-yellow-400"
-          >
-            <FaSmile size={24} />
-          </button>
-          {showEmojiPicker && (
-            <div className="absolute bottom-[60px] left-2 sm:left-12 z-10 max-w-[90vw]">
-              <EmojiPicker onEmojiClick={handleEmojiClick} />
-            </div>
-          )}
+  {/* 😊 Emoji Button */}
+  <button
+    type="button"
+    onClick={() => setShowEmojiPicker((prev) => !prev)}
+    className="text-yellow-300 hover:text-yellow-400"
+  >
+    <FaSmile size={24} />
+  </button>
 
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 min-w-[150px] px-4 py-2 bg-gray-700 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
-          >
-            Send
-          </button>
-        </form>
+  {showEmojiPicker && (
+    <div className="absolute bottom-[60px] left-2 sm:left-12 z-10 max-w-[90vw]">
+      <EmojiPicker onEmojiClick={handleEmojiClick} />
+    </div>
+  )}
+
+  {/* ✍️ Text Input */}
+  <input
+    value={text}
+    onChange={(e) => setText(e.target.value)}
+    placeholder="Type a message..."
+    className="flex-1 min-w-[0] w-full sm:w-auto px-4 py-2 bg-gray-700 rounded-full text-white focus:outline-none"
+  />
+
+  {/* 📤 Send Button */}
+  <button
+    type="submit"
+    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full whitespace-nowrap"
+  >
+    Send
+  </button>
+</form>
+
 
         {showImagePreview && selectedImages.length > 0 && (
           <ImagePreviewModal

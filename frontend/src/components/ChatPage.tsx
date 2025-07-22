@@ -1,3 +1,4 @@
+// ChatPage.tsx
 import { useEffect, useState } from "react";
 import ChatBox from "../pages/ChatBox";
 import ChatListSidebar from "./ChatListSidebar";
@@ -15,7 +16,7 @@ function ChatPage() {
   // Detect screen size
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640); // sm breakpoint (Tailwind default)
+      setIsMobile(window.innerWidth < 640);
     };
 
     checkMobile();
@@ -40,10 +41,10 @@ function ChatPage() {
 
   if (!currentUserId) return <p className="text-white p-4">Loading...</p>;
 
-  // Mobile logic
+  // Mobile layout
   if (isMobile) {
     return (
-      <div className="h-screen bg-gray-900 text-white">
+      <div className="h-screen w-full flex flex-col overflow-hidden bg-gray-900 text-white">
         {userId ? (
           <ChatProvider userId={userId}>
             <ChatBox />
@@ -57,13 +58,13 @@ function ChatPage() {
 
   // Desktop layout
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      {/* 🟢 Sidebar */}
+    <div className="flex h-screen w-full bg-gray-900 text-white overflow-hidden">
+      {/* Sidebar */}
       <div className="w-[300px] border-r border-gray-700 overflow-y-auto custom-scrollbar">
         <ChatListSidebar currentUserId={currentUserId} />
       </div>
 
-      {/* 🟦 Chat area */}
+      {/* Chat area */}
       <div className="flex-1 flex items-center justify-center relative">
         {userId ? (
           <ChatProvider userId={userId}>
@@ -71,7 +72,7 @@ function ChatPage() {
           </ChatProvider>
         ) : (
           <div className="text-center space-y-3">
-            <h2 className="text-3xl font-bold text-blue-400">Welcome to  ByteChat 💬</h2>
+            <h2 className="text-3xl font-bold text-blue-400">Welcome to ByteChat 💬</h2>
             <p className="text-gray-400">Select a user from the sidebar to start chatting.</p>
             <p className="text-sm text-gray-500">Your conversations appear here.</p>
           </div>
