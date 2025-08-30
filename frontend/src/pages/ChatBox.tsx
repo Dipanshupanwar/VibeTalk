@@ -40,7 +40,7 @@ function ChatBox() {
   const [isAtBottom, setIsAtBottom] = useState(true);
 
   const unreadRef = useRef(0);
-  const lastUnreadMessageId = useRef<string | null>(null);
+  const lastUnreadMessageId = useRef<string | null | undefined>(null);
   const navigate = useNavigate();
 
   const handleEmojiClick = (emojiData: any) => {
